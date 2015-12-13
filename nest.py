@@ -109,11 +109,35 @@ class Nest:
         for k in sorted(allvars.keys()):
              print k + "."*(32-len(k)) + ":", allvars[k]
 
+    def dump_status(self):
+        shared = self.status["shared"][self.serial]
+        device = self.status["device"][self.serial]
+
+        allvars = shared
+        allvars.update(device)
+
+        for k in sorted(allvars.keys()):
+             print k + " "*(31-len(k)) + " ", allvars[k]
+
     def show_curtemp(self):
         temp = self.status["shared"][self.serial]["current_temperature"]
         temp = self.temp_out(temp)
 
         print "%0.1f" % temp
+
+    def show_cool(self):
+        temp = self.status["shared"][self.serial]["target_temperature"]
+        temp = self.temp_out(temp)
+
+        if (self.status["shared"][self.serial]["target_temperature_type"] == "cool"):
+            print "%0.1f" % temp
+
+    def show_heat(self):
+        temp = self.status["shared"][self.serial]["target_temperature"]
+        temp = self.temp_out(temp)
+
+        if (self.status["shared"][self.serial]["target_temperature_type"] == "heat"):
+            print "%0.1f" % temp
 
     def set_temperature(self, temp):
         temp = self.temp_in(temp)
@@ -181,6 +205,11 @@ def help():
     print "    curtemp               ... print current temperature"
     print "    curhumid              ... print current humidity"
     print
+    print "commands: cool, heat, dump"
+    print "    cool                  ... print target temp if cooling mode"
+    print "    heat                  ... print target temp if heating mode"
+    print "    dump                  ... everything as key-value space separated lines"
+    print
     print "examples:"
     print "    nest.py --user joe@user.com --password swordfish temp 73"
     print "    nest.py --user joe@user.com --password swordfish fan auto"
@@ -220,6 +249,12 @@ def main():
         n.set_fan(args[1])
     elif (cmd == "show"):
         n.show_status()
+    elif (cmd == "dump"):
+        n.dump_status()
+    elif (cmd == "cool"):
+        n.show_cool()
+    elif (cmd == "heat"):
+        n.show_heat()
     elif (cmd == "curtemp"):
         n.show_curtemp()
     elif (cmd == "curhumid"):
